@@ -2,7 +2,7 @@
 
 This script scrapes the [House of Lords Hansard website](https://hansard.parliament.uk/lords/) every day at 6pm and tweets the issues debated that day (if they are debating - which they don't usually do on Fri, Sat and Sun).
 
-It runs on a free Heroku account using the Heroku Scheduler add-on. Before I wrote this script in Ruby and ran it on my local machine on a 24-hour loop.
+It runs on a free Heroku account using the Heroku Scheduler add-on. I wrote this script originally in Ruby and ran it on my local machine on a 24-hour loop.
 
 I've put this up here as much for my future self, to remind me how this all works and to use as a template. 
 
