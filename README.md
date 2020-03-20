@@ -18,9 +18,9 @@ Sometimes the issues listed on Hansard create a string longer than 280 character
 2. Apply for a Twitter developer account, stick your tokens and keys in config.py
 3. Create your own requirements.txt by typing the following:
 
-   ```
+  ```
     $ pip3 freeze > requirements.txt
-   ```
+  ```
 or:
 
   ```
