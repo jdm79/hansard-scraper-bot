@@ -6,7 +6,7 @@ It runs on a free Heroku account using the Heroku Scheduler add-on. I wrote this
 
 I've put this up here as much for my future self, to remind me how this all works and to use as a template. 
 
-You can visit me on Twitter [here](https://twitter.com/HansardLord).
+You can visit this bot on Twitter [here](https://twitter.com/HansardLord).
 
 ### Features
 
