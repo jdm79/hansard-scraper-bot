@@ -62,7 +62,7 @@ def scrape():
       api.update_status(intro + string)
     else:
       first, second = string[:len(string)//2], string[len(string)//2:]
-      if len(first) < 280:
+      if len(first) < 250:
         api.update_status(intro + first)
         api.update_status(cont + second)
       else:
