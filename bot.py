@@ -31,6 +31,8 @@ def scrape():
   issues_list = []
   nada = "Nothing to report so far today."
 
+  # don't use this for now
+  # this takes the message on the Hansard page, but need to look at how they use it every day
   # html_message = soup.find('p')
   # message_string = html_message.text.strip()
   # messages = message_string.split(".")
@@ -50,7 +52,6 @@ def scrape():
 
   # convert back to list
   issues = list(issues_set)
-
   string = ', '.join(sorted(issues))
 
   intro = day + ", the Lords discussed: "
@@ -67,15 +68,8 @@ def scrape():
       else:
         first_frag, second_frag = first[:len(first)//2], first[len(first)//2:]
         third_frag, fourth_frag = second[:len(second)//2], second[len(second)//2:]
-
-        time.sleep(3)
-
-        print(second_frag)
         api.update_status(intro + first_frag)
         api.update_status(cont + second_frag)
-
-        time.sleep(3)
-
         api.update_status(cont + third_frag)
         api.update_status(cont + fourth_frag)
   else:
