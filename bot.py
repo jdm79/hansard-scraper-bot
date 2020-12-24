@@ -15,18 +15,21 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
-
+# to be used to work out what day it is - and so whether to scrape or not (Lords don't sit fri-sun)
 days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 today = date.today().isoweekday() - 1
 day = days[today]
   
 headers = {"Accept-language": "en-US, en;q=0.5"}
 url = "https://hansard.parliament.uk/lords/"
+
+# date stamp to be used for the dynamic urls
 time_stamp = datetime.datetime.now()
 date_stamp = time_stamp.strftime("%Y-%m-%d")
 
 def scrape():
 
+  # creates dynamic url to get the current day's list
   results = requests.get(url + date_stamp, headers=headers)
 
   soup = BeautifulSoup(results.text, "html.parser")
@@ -35,11 +38,12 @@ def scrape():
   for span_tag in soup.findAll('span'):
     span_tag.replace_with('')
 
-  # they changed it...
+  # the issues_div is subject to change without any warning
+  # need a way of knowing when this happens, rather than just noticing the code not running
   issues_div = soup.find_all('div', class_='primary-info')
   issues_list = []
-  nada = "Nothing to report so far today."
 
+  # this gets rid of the whitespace in the html text
   for container in issues_div:
     issue = container.text
     issues_list.append(issue.strip())
@@ -50,7 +54,11 @@ def scrape():
   # convert back to list
   issues = list(issues_set)
 
+  # create the big string
   string_dirty = ', '.join(sorted(issues))
+
+  # abbreviate or shorten the repetitive list items - to be added to
+  # really trying to keep the final string as short as possible so it doesn't create so many tweets 
   string = string_dirty.replace('Arrangement of Business', '')
   string = string.replace('Regulations 2020', 'Regs 2020')
   string = string.replace('Business of the House', 'BoH')
@@ -61,6 +69,10 @@ def scrape():
 
   intro = day + ", the Lords discussed: "
   cont = "Cont'd: "
+  nada = "Nothing to report so far today."
+
+  
+  # this creates a clickable link to the pdf version - dynamically created url 
   pdf_link = "https://hansard.parliament.uk/pdf/lords/" + date_stamp
   pdf_tweet = "You can download the Hansard record of the entire day in PDF format here: " + pdf_link
 
@@ -68,12 +80,14 @@ def scrape():
     api.update_status(intro + string)
     api.update_status(pdf_tweet)
 
+  # i cannot maths. this splits the string into two tweets which will be under 280 characters with intro/cont
   elif len(string) < 500:
     first, second = string[:len(string)//2], string[len(string)//2:]
     api.update_status(intro + first)
     api.update_status(cont + second)
     api.update_status(pdf_tweet)
 
+  # this can all go into a function if it works reliably in January
   elif len(string) < 774:
     first = string[:242]
     second = string[242:508]
@@ -102,6 +116,8 @@ def scrape():
     fourth = string[774:1040] 
     fifth = string[1040:1306]
 
+    # sometimes they may not be anything to go into the fifth tweet...
+    # need to make the (1/5) dynamic and smart rather than static
     api.update_status(intro + first + " (1/5)")
     api.update_status(cont + second + " (2/5)")
     api.update_status(cont + third + " (3/5)")
@@ -110,6 +126,8 @@ def scrape():
       api.update_status(cont + fifth + " (5/5)")
     api.update_status(pdf_tweet)
 
+  # if the list of issues has more than 1572 characters this whole program will not work...
+  # i really don't want to be littering people's timelines with more than 6 tweets though
   elif len(string) < 1572:
     first = string[:242]
     second = string[242:508]
@@ -130,6 +148,7 @@ def scrape():
   else:
     api.update_status(nada)
 
+# only scrape on days the lords are meant to sit
 if today < 4:
   scrape()
 else:
