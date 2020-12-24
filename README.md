@@ -1,12 +1,16 @@
 ## Python web scraper Twitter bot
 
-This script scrapes the [House of Lords Hansard website](https://hansard.parliament.uk/lords/) every day at 6pm and tweets the issues debated that day (if they are debating - which they don't usually do on Fri, Sat and Sun).
+This script scrapes the [House of Lords Hansard website](https://hansard.parliament.uk/lords/) every day at 6pm and tweets the issues debated that day (if they are debating - which they don't usually do on Fri, Sat and Sun). 
 
-It runs on a free Heroku account using the Heroku Scheduler add-on. I wrote this script originally in Ruby and ran it on my local machine on a 24-hour loop.
+This is not the github repo for the Twitter bot now that it's on Heroku as I don't want to have my API tokens and oauth in public. Currently I keep the tokens and oauth stuff all in the same main file now, as the config wasn't working on Heroku. Whenever I update the private repo, I try to keep this repo similar.
+
+In the other repo I have another script similar to this which runs at 10pm as the final round-up - it is usually different too as they seem to never stop updating these lists. 
+
+It runs on a free Heroku account using the Heroku Scheduler add-on for both scripts. I wrote this script originally in Ruby and ran it on my local machine on a 24-hour loop.
 
 I've put this up here as much for my future self, to remind me how this all works and to use as a template. 
 
-You can visit me on Twitter [here](https://twitter.com/HansardLord).
+You can visit this bot on Twitter [here](https://twitter.com/HansardLord).
 
 ### Features
 
@@ -35,4 +39,3 @@ or:
 
 If you're scraping a different website, you'll have to use inspect element on the html page to find the elements you want and change the code accordingly.
 
-ALWAYS PUT YOUR CONFIG.PY IN .GITIGNORE, else people will see your secret tokens and keys and take over your bots!
