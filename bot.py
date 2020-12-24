@@ -10,6 +10,7 @@ import random
 import time
 import config
 
+# on the private live repo version of this, the auth tokens are placed here because Heroku
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
@@ -28,57 +29,103 @@ def scrape():
   results = requests.get(url + date_stamp, headers=headers)
 
   soup = BeautifulSoup(results.text, "html.parser")
-  issues_div = soup.find_all('li', class_='no-children')
+  
+  # this gets rid of the span texts (item number n) etc
+  for span_tag in soup.findAll('span'):
+    span_tag.replace_with('')
+
+  # they changed it...
+  issues_div = soup.find_all('div', class_='primary-info')
   issues_list = []
   nada = "Nothing to report so far today."
 
-  # html_message = soup.find('p')
-  # message_string = html_message.text.strip()
-  # messages = message_string.split(".")
-  
-  # if (messages[0].find(".") == -1):
-  #   # print(messages[0])
-  #   api.update_status(messages[0])
-  # else:
-
   for container in issues_div:
-    issue = container.a.text
+    issue = container.text
     issues_list.append(issue.strip())
 
   # make the items in the list unique
   issues_set = set(issues_list)
-  issues_set.remove("House of Lords")
 
   # convert back to list
   issues = list(issues_set)
 
-  string = ', '.join(sorted(issues))
+  string_dirty = ', '.join(sorted(issues))
+  string = string_dirty.replace('Arrangement of Business', '')
+  string = string.replace('Regulations 2020', 'Regs 2020')
+  string = string.replace('Business of the House', 'BoH')
+  string = string.replace('House of Lords', 'HoL')
+  string = string.replace('Lord Speaker’s Statement', 'LSS')
+  string = string.replace('Whole day', '|')
+  string = string[2:]
 
   intro = day + ", the Lords discussed: "
-  cont = "Cont'd... "
+  cont = "Cont'd: "
+  pdf_link = "https://hansard.parliament.uk/pdf/lords/" + date_stamp
+  pdf_tweet = "You can download the Hansard record of the entire day in PDF format here: " + pdf_link
 
-  if len(string) > 0:
-    if len(string) < 250:
-      api.update_status(intro + string)
-    else:
-      first, second = string[:len(string)//2], string[len(string)//2:]
-      if len(first) < 280:
-        api.update_status(intro + first)
-        api.update_status(cont + second)
-      else:
-        first_frag, second_frag = first[:len(first)//2], first[len(first)//2:]
-        third_frag, fourth_frag = second[:len(second)//2], second[len(second)//2:]
+  if len(string) < 242:
+    api.update_status(intro + string)
+    api.update_status(pdf_tweet)
 
-        time.sleep(3)
+  elif len(string) < 500:
+    first, second = string[:len(string)//2], string[len(string)//2:]
+    api.update_status(intro + first)
+    api.update_status(cont + second)
+    api.update_status(pdf_tweet)
 
-        print(second_frag)
-        api.update_status(intro + first_frag)
-        api.update_status(cont + second_frag)
+  elif len(string) < 774:
+    first = string[:242]
+    second = string[242:508]
+    third = string[508:774]
+    api.update_status(intro + first + " (1/3)")
+    api.update_status(cont + second + " (2/3)")
+    api.update_status(cont + third + " (3/3)")
+    api.update_status(pdf_tweet)
 
-        time.sleep(3)
+  elif len(string) < 1040:
+    first = string[:242]
+    second = string[242:508]
+    third = string[508:774]
+    fourth = string[774:1040]
 
-        api.update_status(cont + third_frag)
-        api.update_status(cont + fourth_frag)
+    api.update_status(intro + first + " (1/4)")
+    api.update_status(cont + second + " (2/4)")
+    api.update_status(cont + third + " (3/4)")
+    api.update_status(cont + fourth + " (4/4)")
+    api.update_status(pdf_tweet)
+
+  elif len(string) < 1306:
+    first = string[:242]
+    second = string[242:508]
+    third = string[508:774]
+    fourth = string[774:1040] 
+    fifth = string[1040:1306]
+
+    api.update_status(intro + first + " (1/5)")
+    api.update_status(cont + second + " (2/5)")
+    api.update_status(cont + third + " (3/5)")
+    api.update_status(cont + fourth + " (4/5)")
+    if len(fifth) > 0: 
+      api.update_status(cont + fifth + " (5/5)")
+    api.update_status(pdf_tweet)
+
+  elif len(string) < 1572:
+    first = string[:242]
+    second = string[242:508]
+    third = string[508:774]
+    fourth = string[774:1040] 
+    fifth = string[1040:1306]
+    sixth = string[1306:1572]
+
+    api.update_status(intro + first + " (1/6)")
+    api.update_status(cont + second + " (2/6)")
+    api.update_status(cont + third + " (3/6)")
+    api.update_status(cont + fourth + " (4/6)")
+    api.update_status(cont + fifth + " (5/6)")
+    if len(sixth) > 0:
+      api.update_status(cont + sixth + " (6/6)")
+    api.update_status(pdf_tweet)
+
   else:
     api.update_status(nada)
 
