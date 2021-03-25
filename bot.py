@@ -152,7 +152,7 @@ def scrape():
       api.update_status(nada)
 
 # only scrape on days the lords are meant to sit
-if today < 4:
+if today < 5:
   scrape()
 else:
   api.update_status("The Lords do not debate on " + day + "s.")
